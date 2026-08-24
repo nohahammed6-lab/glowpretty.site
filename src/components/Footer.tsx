@@ -222,7 +222,7 @@ export const Footer: React.FC<FooterProps> = ({
 
       {/* Bottom Rights */}
       <div className="py-6 border-t border-white/10 bg-[#000000] px-6">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-white/60 gap-3">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-center text-xs text-white/60 gap-3">
           <p className="text-center font-medium text-white/70">
             All Copyright @{' '}
             <a
@@ -234,12 +234,6 @@ export const Footer: React.FC<FooterProps> = ({
               solimanMedia
             </a>
           </p>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#121212] border border-[#D4AF37]/40 text-[11px] text-[#D4AF37] font-mono shadow-sm">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              <span className="font-semibold">Vercel Live: Connected ✓</span>
-            </span>
-          </div>
         </div>
       </div>
     </footer>
