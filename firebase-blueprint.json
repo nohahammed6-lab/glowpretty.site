@@ -1,0 +1,52 @@
+{
+  "entities": {
+    "siteSettings": {
+      "title": "Site Settings",
+      "description": "Global salon contact info, working hours, email, location and social links",
+      "type": "document",
+      "path": "app_data/settings"
+    },
+    "services": {
+      "title": "Services List",
+      "description": "List of beauty salon services, categories, prices and descriptions",
+      "type": "document",
+      "path": "app_data/services"
+    },
+    "gallery": {
+      "title": "Gallery Items",
+      "description": "Photos and titles for the salon gallery",
+      "type": "document",
+      "path": "app_data/gallery"
+    },
+    "offers": {
+      "title": "Offers List",
+      "description": "Special offers and discounts",
+      "type": "document",
+      "path": "app_data/offers"
+    },
+    "supervisors": {
+      "title": "Supervisors List",
+      "description": "Supervisor accounts and passcodes",
+      "type": "document",
+      "path": "app_data/supervisors"
+    },
+    "heroSlides": {
+      "title": "Hero Banners",
+      "description": "Main homepage hero banners and text",
+      "type": "document",
+      "path": "app_data/hero_slides"
+    },
+    "aboutContent": {
+      "title": "About Content",
+      "description": "About section details and features",
+      "type": "document",
+      "path": "app_data/about"
+    },
+    "appointments": {
+      "title": "Appointments",
+      "description": "Client bookings and appointment records",
+      "type": "collection",
+      "path": "appointments"
+    }
+  }
+}

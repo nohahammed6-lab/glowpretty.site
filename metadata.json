@@ -1,0 +1,6 @@
+{
+  "name": "GLOW PRETTY",
+  "description": "Luxury Beauty Salon & Booking Portal",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
