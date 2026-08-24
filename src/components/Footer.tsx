@@ -235,9 +235,9 @@ export const Footer: React.FC<FooterProps> = ({
             </a>
           </p>
           <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#121212] border border-[#D4AF37]/30 text-[11px] text-[#D4AF37] font-mono">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>v2.8.24-live</span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#121212] border border-[#D4AF37]/40 text-[11px] text-[#D4AF37] font-mono shadow-sm">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="font-semibold">Vercel Live: Connected ✓</span>
             </span>
           </div>
         </div>
