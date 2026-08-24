@@ -140,4 +140,5 @@ export interface AboutContent {
   storyAR: string;
   featuresEN: string[];
   featuresAR: string[];
+  mainImageUrl?: string;
 }

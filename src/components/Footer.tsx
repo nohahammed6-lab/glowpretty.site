@@ -102,7 +102,7 @@ export const Footer: React.FC<FooterProps> = ({
             <li>
               <button
                 onClick={() => {
-                  setViewMode('contact');
+                  setViewMode('home');
                   setTimeout(() => {
                     document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' });
                   }, 100);

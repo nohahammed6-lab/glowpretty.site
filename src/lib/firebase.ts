@@ -266,7 +266,7 @@ export function subscribeToDoc<T extends object>(
     (snapshot: any) => {
       if (snapshot.exists()) {
         const remoteData = snapshot.data() as T;
-        const validData = remoteData || fallbackData;
+        const validData = remoteData !== undefined && remoteData !== null ? remoteData : fallbackData;
         const newJson = JSON.stringify(validData);
         persistJson(docId, newJson);
         if (newJson !== lastJson) {
@@ -276,7 +276,7 @@ export function subscribeToDoc<T extends object>(
         return;
       }
 
-      // If document doesn't exist remotely yet, check local storage or fallback
+      // If document doesn't exist remotely yet, use stored local data or fallback in-memory (READ-ONLY: no auto writes)
       let localData: T | null = null;
       const stored = getStoredJson(docId);
       if (stored) {
@@ -289,8 +289,6 @@ export function subscribeToDoc<T extends object>(
       }
 
       const dataToUse = localData || fallbackData;
-      const cleanDataToUse = JSON.parse(JSON.stringify(dataToUse));
-      setDoc(docRef, cleanDataToUse, { merge: true }).catch(console.error);
       const finalJson = JSON.stringify(dataToUse);
       persistJson(docId, finalJson);
       if (finalJson !== lastJson) {
@@ -426,9 +424,8 @@ export function subscribeToDocArray<T>(
         } catch {}
       }
 
+      // Read-only in-memory fallback: do not auto-write to Firestore on read
       const dataToUse = localData !== null ? localData : fallbackData;
-      const cleanDataToUse = JSON.parse(JSON.stringify(dataToUse));
-      setDoc(docRef, { items: cleanDataToUse }, { merge: true }).catch(console.error);
       const finalJson = JSON.stringify(dataToUse);
       persistJson(docId, finalJson);
       if (finalJson !== lastJson) {

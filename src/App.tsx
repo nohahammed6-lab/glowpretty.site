@@ -37,14 +37,24 @@ import { NewAppointmentModal } from './components/NewAppointmentModal';
 import { NewServiceModal } from './components/NewServiceModal';
 import { AdminLoginModal } from './components/AdminLoginModal';
 import { NotificationToast } from './components/NotificationToast';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import {
-  subscribeToDoc,
-  subscribeToDocArray,
   saveDoc,
   saveDocArray,
   hasLocalCache,
   preloadAllDatabaseData,
 } from './lib/firebase';
+import {
+  subscribeSiteSettings,
+  subscribeCategories,
+  subscribeServices,
+  subscribeAppointments,
+  subscribeReviews,
+  subscribeGallery,
+  subscribeAboutContent,
+  subscribeSupervisors,
+  subscribeCoupons,
+} from './services';
 
 export default function App() {
   // Initial Sync state for first-time device visits to eliminate flashing old mock data
@@ -180,13 +190,6 @@ export default function App() {
 
   const [ownerPin, setOwnerPin] = useState<string>(() => {
     try {
-      const resetDone = localStorage.getItem('glow_pin_reset_100200300');
-      if (!resetDone) {
-        localStorage.setItem('glow_owner_pin', '100200300');
-        localStorage.setItem('glow_pin_reset_100200300', 'true');
-        saveDoc('owner_pin', { pin: '100200300' });
-        return '100200300';
-      }
       const saved = localStorage.getItem('glow_owner_pin');
       return saved && saved !== '1234' ? saved : '100200300';
     } catch {
@@ -198,7 +201,7 @@ export default function App() {
   useEffect(() => {
     let isMounted = true;
 
-    // Fast batch prefetch
+    // Fast batch prefetch (READ-ONLY)
     preloadAllDatabaseData()
       .then((preloaded) => {
         if (!isMounted) return;
@@ -218,8 +221,7 @@ export default function App() {
         }
         if (preloaded.reviews && preloaded.reviews.length > 0) setReviews(preloaded.reviews);
         if (preloaded.gallery) {
-          const filteredGal = preloaded.gallery.filter((g) => g && !['gal-1', 'gal-2', 'gal-3', 'gal-4'].includes(g.id));
-          setGallery(filteredGal);
+          setGallery(preloaded.gallery);
         }
         if (preloaded.aboutContent) setAboutContent(preloaded.aboutContent);
         if (preloaded.supervisors) setSupervisors(preloaded.supervisors);
@@ -239,57 +241,20 @@ export default function App() {
       }
     }, 1000);
 
-    // Continuous Real-time Listeners across all devices
-    const unsubSite = subscribeToDoc<SiteSettings>('site_settings', (data) => setSiteSettings(data), INITIAL_SITE_SETTINGS);
-    const unsubCat = subscribeToDocArray<CategoryItem>('categories', (items) => setCategories(items), INITIAL_CATEGORIES);
-    const unsubSrv = subscribeToDocArray<Service>('services', (items) => {
+    // Continuous Real-time Listeners across all devices (READ-ONLY from services)
+    const unsubSite = subscribeSiteSettings((data) => setSiteSettings(data));
+    const unsubCat = subscribeCategories((items) => setCategories(items));
+    const unsubSrv = subscribeServices((items) => {
       if (items && items.length > 0) {
         setServices(items);
       }
-    }, INITIAL_SERVICES);
-    const unsubApt = subscribeToDocArray<Appointment>('appointments', (items) => {
-      const validItems = (items || [])
-        .filter((item) => Boolean(item && (item.clientName || item.serviceName)))
-        .map((item, idx) => ({
-          ...item,
-          id: item.id || `apt-fixed-${idx}`,
-        }));
-
-      setAppointments(validItems);
-    }, []);
-    const unsubRev = subscribeToDocArray<Review>('reviews', (items) => setReviews(items), INITIAL_REVIEWS);
-    const unsubGal = subscribeToDocArray<GalleryItem>('gallery', (items) => {
-      const filtered = (items || []).filter((g) => g && !['gal-1', 'gal-2', 'gal-3', 'gal-4'].includes(g.id));
-      const hasCleanedLegacyGal = localStorage.getItem('glow_gallery_cleaned_v2');
-      if (!hasCleanedLegacyGal || filtered.length !== (items || []).length) {
-        saveDocArray('gallery', filtered);
-        try {
-          localStorage.setItem('glow_gallery', JSON.stringify(filtered));
-          localStorage.setItem('glow_gallery_cleaned_v2', 'true');
-        } catch {}
-      }
-      setGallery(filtered);
-    }, []);
-    const unsubAbt = subscribeToDoc<AboutContent>('about_content', (data) => setAboutContent(data), INITIAL_ABOUT_CONTENT);
-    const unsubSup = subscribeToDocArray<Supervisor>('supervisors', (items) => {
-      const hasCleanedSup = localStorage.getItem('glow_supervisors_clean_v1');
-      if (!hasCleanedSup) {
-        saveDocArray('supervisors', []);
-        try {
-          localStorage.setItem('glow_supervisors', JSON.stringify([]));
-          localStorage.setItem('glow_supervisors_clean_v1', 'true');
-        } catch {}
-        setSupervisors([]);
-        return;
-      }
-      const sanitized = (items || []).filter(Boolean).map((sup, idx) => ({
-        ...sup,
-        id: sup.id || `sup-fixed-${idx}`,
-      }));
-      setSupervisors(sanitized);
-    }, INITIAL_SUPERVISORS);
-    const unsubCpn = subscribeToDocArray<Coupon>('coupons', (items) => setCoupons(items), INITIAL_COUPONS);
-    const unsubPin = subscribeToDoc<{ pin: string }>('owner_pin', (data) => setOwnerPin(data?.pin && data.pin !== '1234' ? data.pin : '100200300'), { pin: '100200300' });
+    });
+    const unsubApt = subscribeAppointments((items) => setAppointments(items));
+    const unsubRev = subscribeReviews((items) => setReviews(items));
+    const unsubGal = subscribeGallery((items) => setGallery(items));
+    const unsubAbt = subscribeAboutContent((data) => setAboutContent(data));
+    const unsubSup = subscribeSupervisors((items) => setSupervisors(items));
+    const unsubCpn = subscribeCoupons((items) => setCoupons(items));
 
     return () => {
       isMounted = false;
@@ -303,7 +268,6 @@ export default function App() {
       unsubAbt();
       unsubSup();
       unsubCpn();
-      unsubPin();
     };
   }, []);
 
@@ -688,52 +652,57 @@ export default function App() {
   };
 
   if (isInitialSyncing) {
+    const isAr = language === 'ar';
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#2a0011] via-[#3f0018] to-[#1a000a] text-white flex flex-col items-center justify-center p-6 select-none" dir="rtl">
-        <div className="max-w-md w-full text-center flex flex-col items-center animate-fade-in">
-          {/* Logo & Glow Circle */}
-          <div className="relative mb-6">
-            <div className="absolute inset-0 bg-[#D4AF37]/25 blur-2xl rounded-full scale-125 animate-pulse"></div>
-            <div className="relative w-24 h-24 rounded-full border-2 border-[#D4AF37] bg-[#530025] flex items-center justify-center shadow-2xl shadow-[#D4AF37]/20">
-              <span className="material-symbols-outlined text-4xl text-[#D4AF37] animate-spin-slow">
-                spa
-              </span>
-            </div>
-          </div>
-
-          {/* Salon Title */}
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#D4AF37] font-serif mb-2 tracking-wide">
-            صالون جلو بريتي للتجميل
-          </h1>
-          <p className="text-xs md:text-sm text-pink-200/80 mb-8 font-medium">
-            Glow Pretty Beauty Salon • قطر
-          </p>
-
-          {/* Sync Progress Indicator */}
-          <div className="w-full bg-[#1c000b]/80 border border-[#D4AF37]/30 rounded-2xl p-5 shadow-xl backdrop-blur-md">
-            <div className="flex items-center justify-center gap-3 text-sm text-[#ffd9df] mb-4">
-              <span className="material-symbols-outlined text-[#D4AF37] text-xl animate-spin">
-                sync
-              </span>
-              <span className="font-semibold">جاري مزامنة أحدث الخدمات والأسعار من قاعدة البيانات...</span>
+      <ErrorBoundary isArabic={isAr}>
+        <div
+          className="min-h-screen bg-gradient-to-b from-[#2a0011] via-[#3f0018] to-[#1a000a] text-white flex flex-col items-center justify-center p-6 select-none"
+          dir={isAr ? 'rtl' : 'ltr'}
+        >
+          <div className="max-w-md w-full text-center flex flex-col items-center animate-fade-in">
+            {/* Logo & Glow Circle */}
+            <div className="relative mb-6">
+              <div className="absolute inset-0 bg-[#D4AF37]/25 blur-2xl rounded-full scale-125 animate-pulse"></div>
+              <div className="relative w-24 h-24 rounded-full border-2 border-[#D4AF37] bg-[#530025] flex items-center justify-center shadow-2xl shadow-[#D4AF37]/20">
+                <span className="material-symbols-outlined text-4xl text-[#D4AF37] animate-spin-slow">
+                  spa
+                </span>
+              </div>
             </div>
 
-            {/* Glowing Golden Bar */}
-            <div className="w-full bg-[#3a0018] h-2 rounded-full overflow-hidden p-0.5 border border-[#D4AF37]/20">
-              <div className="h-full bg-gradient-to-r from-[#D4AF37] via-[#fff2af] to-[#D4AF37] rounded-full animate-pulse w-full"></div>
-            </div>
-
-            <p className="text-[11px] text-pink-300/60 mt-3">
-              اتصال مباشر وفوري • يظهر لكِ أحدث العروض والخدمات مباشرة
+            {/* Salon Title */}
+            <h1 className="text-2xl md:text-3xl font-extrabold text-[#D4AF37] font-serif mb-2 tracking-wide">
+              {isAr ? 'صالون غلو بريتي للتجميل' : 'GLOW PRETTY Beauty Salon'}
+            </h1>
+            <p className="text-xs md:text-sm text-pink-200/80 mb-8 font-medium">
+              {isAr ? 'قطر • تجربة تجميل ملكية فاخرة' : 'Qatar • Luxury Royal Beauty Experience'}
             </p>
+
+            {/* Clean, Professional Loader */}
+            <div className="w-full bg-[#1c000b]/80 border border-[#D4AF37]/30 rounded-2xl p-5 shadow-xl backdrop-blur-md">
+              <div className="flex items-center justify-center gap-3 text-sm text-[#ffd9df] mb-4">
+                <span className="material-symbols-outlined text-[#D4AF37] text-xl animate-spin">
+                  progress_activity
+                </span>
+                <span className="font-semibold">
+                  {isAr ? 'مرحباً بكِ في صالون جلو بريتي • جاري التحميل...' : 'Welcome to GLOW PRETTY • Loading...'}
+                </span>
+              </div>
+
+              {/* Glowing Golden Bar */}
+              <div className="w-full bg-[#3a0018] h-1.5 rounded-full overflow-hidden p-0.5 border border-[#D4AF37]/20">
+                <div className="h-full bg-gradient-to-r from-[#D4AF37] via-[#fff2af] to-[#D4AF37] rounded-full animate-pulse w-full"></div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </ErrorBoundary>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col font-body bg-[#fcf9f8] text-[#1c1b1b] selection:bg-[#ffd9df] selection:text-[#3f0018]">
+    <ErrorBoundary isArabic={language === 'ar'}>
+      <div className="min-h-screen flex flex-col font-body bg-[#fcf9f8] text-[#1c1b1b] selection:bg-[#ffd9df] selection:text-[#3f0018]">
       
       {/* Active Admin Indicator Bar */}
       {viewMode === 'admin' && (
@@ -932,6 +901,7 @@ export default function App() {
         onClose={() => setToastMessage(null)}
       />
 
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
