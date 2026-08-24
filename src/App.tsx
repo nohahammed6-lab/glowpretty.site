@@ -130,9 +130,15 @@ export default function App() {
   const [gallery, setGallery] = useState<GalleryItem[]>(() => {
     try {
       const saved = sessionStorage.getItem('glow_gallery') || localStorage.getItem('glow_gallery');
-      return saved ? JSON.parse(saved) : INITIAL_GALLERY;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return parsed.filter((g) => g && !['gal-1', 'gal-2', 'gal-3', 'gal-4'].includes(g.id));
+        }
+      }
+      return [];
     } catch {
-      return INITIAL_GALLERY;
+      return [];
     }
   });
 
@@ -211,7 +217,10 @@ export default function App() {
           setAppointments(validItems);
         }
         if (preloaded.reviews && preloaded.reviews.length > 0) setReviews(preloaded.reviews);
-        if (preloaded.gallery && preloaded.gallery.length > 0) setGallery(preloaded.gallery);
+        if (preloaded.gallery) {
+          const filteredGal = preloaded.gallery.filter((g) => g && !['gal-1', 'gal-2', 'gal-3', 'gal-4'].includes(g.id));
+          setGallery(filteredGal);
+        }
         if (preloaded.aboutContent) setAboutContent(preloaded.aboutContent);
         if (preloaded.supervisors) setSupervisors(preloaded.supervisors);
         if (preloaded.coupons) setCoupons(preloaded.coupons);
@@ -249,7 +258,18 @@ export default function App() {
       setAppointments(validItems);
     }, []);
     const unsubRev = subscribeToDocArray<Review>('reviews', (items) => setReviews(items), INITIAL_REVIEWS);
-    const unsubGal = subscribeToDocArray<GalleryItem>('gallery', (items) => setGallery(items), INITIAL_GALLERY);
+    const unsubGal = subscribeToDocArray<GalleryItem>('gallery', (items) => {
+      const filtered = (items || []).filter((g) => g && !['gal-1', 'gal-2', 'gal-3', 'gal-4'].includes(g.id));
+      const hasCleanedLegacyGal = localStorage.getItem('glow_gallery_cleaned_v2');
+      if (!hasCleanedLegacyGal || filtered.length !== (items || []).length) {
+        saveDocArray('gallery', filtered);
+        try {
+          localStorage.setItem('glow_gallery', JSON.stringify(filtered));
+          localStorage.setItem('glow_gallery_cleaned_v2', 'true');
+        } catch {}
+      }
+      setGallery(filtered);
+    }, []);
     const unsubAbt = subscribeToDoc<AboutContent>('about_content', (data) => setAboutContent(data), INITIAL_ABOUT_CONTENT);
     const unsubSup = subscribeToDocArray<Supervisor>('supervisors', (items) => {
       const hasCleanedSup = localStorage.getItem('glow_supervisors_clean_v1');

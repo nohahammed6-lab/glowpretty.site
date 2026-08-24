@@ -644,36 +644,7 @@ export const INITIAL_COUPONS: Coupon[] = [
   },
 ];
 
-export const INITIAL_GALLERY: GalleryItem[] = [
-  {
-    id: 'gal-1',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCvfjcP7KZXZdt8NAm2Ga10jmipMWv0uQDuDsQVhhSuV3BaD8HjAKVnzYiuWZrCX9pgLTDcRPiGP05rXMPHvcH6Vc5ZXUpohTsbbI884GUmmPyw1bK3gnzrN3x0McfZjXdjAIvEGKcKp6f69upxR9aHiKCsPnamRlBRtC24vebHvG4v2Fpmk_bxw02E8nmTqlmRYiWs1M7pp0g_VY1JGFvhoXZCARAlqevRzExSuzF9BGyC_JfLqtve',
-    title: 'Royal Lounge Sanctuary',
-    arabicTitle: 'الاستراحة الملكية الفاخرة',
-    span: 'col-span-2 row-span-2',
-  },
-  {
-    id: 'gal-2',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDNEd4exXYjQ2l-tY8BtdA-vNOyJqdZ4UZgJefcdM0kLfqUsCAZloqQ13apu--UkkYdEnBzDmVV5Nso0FBvnArsv56zE2XJYBfUyIiLFJMHbYvOElJ0YEj_JP9ID7Gen_jSnGVgof-29n5mTXIvQbv8A0b1xLb-u-QUQH2Wz0LSKx2iPpHNLjkLwYMTjlIyaTaAIprdsYeNvGzOY1HbQp9sOc7B0nKrWU7mnDBj9S8lxJQofmrgXOD2',
-    title: 'Luxury Cosmetics & Fragrances',
-    arabicTitle: 'مستحضرات التجميل العالمية',
-    span: 'col-span-1 row-span-1',
-  },
-  {
-    id: 'gal-3',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBlEF2hDbcCt0Z2HtvNHKOqoAFHTdmxPhNU2eIdl8gcFyZbIMyA2cq83SlBb87f2QHZ84qsNByZpX35KXZT2EjcnqgymYk8dFaRw1wd_tdtg7qZptIzEN7Ob8e9EhbAfLC1Z-DrWtamkF5y2dLn8noEPcnnzYUbDqZ44powKsbBK5zTTX4rlv_lZbJGFkQbDfqIRBHbY8_Ut2c1WK4RmGBkx4FwuZzAqAnxpiYVuhc8inYMrJwIdPph',
-    title: 'Fresh Orchids Reception',
-    arabicTitle: 'استقبال الأوركيد الفاخر',
-    span: 'col-span-1 row-span-1',
-  },
-  {
-    id: 'gal-4',
-    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBf5wJYNqk_J7oX1M8n37tkzihMxKmyczu8H01cXhrgeGI5g8kG9PA1mLIU1eVbgYtqfnKIVpy9tL6TcdibUSpNeqd4MauzAdt_XznInHYJX4w1FQWX4gLnF5G0b2bK2J8-gioP9G-lrNEgzvs6L_qQvCEj6LRzMtl_QJkSR8beGK0vQggtQvqyvz2wpWlQ_D7HAMkfEmW8TG4pZF2aE2lYeJley27pX-A3KmcycSWDlStJx-FSFULZ',
-    title: 'Private VIP Nails Suite',
-    arabicTitle: 'جناح الأظافر الخاص',
-    span: 'col-span-2 row-span-1',
-  },
-];
+export const INITIAL_GALLERY: GalleryItem[] = [];
 
 export const INITIAL_SITE_SETTINGS: SiteSettings = {
   phone: '+974 4411 2233',

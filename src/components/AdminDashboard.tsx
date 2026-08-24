@@ -1722,52 +1722,66 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </form>
 
             {/* Gallery Grid with Edit and Delete Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {gallery.map((img) => {
-                const optSrc = getOptimizedImageUrl(img.url, { width: 400 });
-                return (
-                  <div key={img.id} className="relative group rounded-2xl overflow-hidden border border-[#D4AF37]/30 shadow-2xs h-52">
-                    {optSrc ? (
-                      <img
-                        key={optSrc}
-                        src={optSrc}
-                        alt={img.title}
-                        loading="lazy"
-                        decoding="async"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-stone-100 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
-                        <span className="material-symbols-outlined text-3xl">photo_camera</span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-between text-white">
-                      <div>
-                        <p className="font-bold text-sm text-[#D4AF37]">{img.arabicTitle}</p>
-                        <p className="text-[10px] text-white/80">{img.title}</p>
-                      </div>
-                      
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => setEditingGalleryItem(img)}
-                          className="bg-[#D4AF37] hover:bg-white text-[#3f0018] text-xs font-bold py-1.5 px-3 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
-                        >
-                          <span className="material-symbols-outlined text-sm">edit</span>
-                          <span>{isArabic ? 'تعديل' : 'Edit'}</span>
-                        </button>
-                        <button
-                          onClick={() => onDeleteGalleryItem(img.id)}
-                          className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
-                        >
-                          <span className="material-symbols-outlined text-sm">delete</span>
-                          <span>{isArabic ? 'حذف' : 'Delete'}</span>
-                        </button>
+            {gallery.length === 0 ? (
+              <div className="text-center py-12 px-4 bg-[#fcf9f8] rounded-2xl border-2 border-dashed border-[#D4AF37]/40">
+                <span className="material-symbols-outlined text-4xl text-[#D4AF37] mb-2">add_photo_alternate</span>
+                <p className="text-sm font-bold text-[#121212]">
+                  {isArabic ? 'لا توجد صور في المعرض حالياً' : 'No photos in the gallery yet'}
+                </p>
+                <p className="text-xs text-[#594045] mt-1">
+                  {isArabic
+                    ? 'يمكنك إضافة صور حقيقية للصالون أو الأعمال من النموذج بالأعلى لتظهر في الواجهة الرئيسية فوراً.'
+                    : 'Upload real salon photos using the form above to display them on the homepage.'}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {gallery.map((img) => {
+                  const optSrc = getOptimizedImageUrl(img.url, { width: 400 });
+                  return (
+                    <div key={img.id} className="relative group rounded-2xl overflow-hidden border border-[#D4AF37]/30 shadow-2xs h-52">
+                      {optSrc ? (
+                        <img
+                          key={optSrc}
+                          src={optSrc}
+                          alt={img.title}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-stone-100 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
+                          <span className="material-symbols-outlined text-3xl">photo_camera</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-between text-white">
+                        <div>
+                          <p className="font-bold text-sm text-[#D4AF37]">{img.arabicTitle}</p>
+                          <p className="text-[10px] text-white/80">{img.title}</p>
+                        </div>
+                        
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => setEditingGalleryItem(img)}
+                            className="bg-[#D4AF37] hover:bg-white text-[#3f0018] text-xs font-bold py-1.5 px-3 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-sm">edit</span>
+                            <span>{isArabic ? 'تعديل' : 'Edit'}</span>
+                          </button>
+                          <button
+                            onClick={() => onDeleteGalleryItem(img.id)}
+                            className="bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-1.5 px-3 rounded-lg flex items-center gap-1 cursor-pointer transition-colors"
+                          >
+                            <span className="material-symbols-outlined text-sm">delete</span>
+                            <span>{isArabic ? 'حذف' : 'Delete'}</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
-            </div>
+                  );
+                })}
+              </div>
+            )}
 
           </div>
         )}

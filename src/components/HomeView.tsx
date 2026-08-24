@@ -295,40 +295,42 @@ export const HomeView: React.FC<HomeViewProps> = ({
         )}
       </section>
 
-      {/* Dynamic Gallery Section */}
-      <section id="gallery" className="py-20 bg-[#FFFDF5]">
-        <div className="max-w-7xl mx-auto px-6 md:px-16">
-          <div className="text-center mb-12">
-            <span className="text-[#121212] font-extrabold text-xs tracking-widest uppercase bg-[#FAF6ED] border border-[#D4AF37]/50 px-3.5 py-1 rounded-full shadow-2xs">
-              {isArabic ? 'معرض الصور الفاخر' : 'SALON ATMOSPHERE'}
-            </span>
-            <h2 className="font-display text-3xl md:text-4xl font-extrabold mt-3 text-[#121212]">
-              {isArabic ? 'أجواء صالون غلو بريتي بالدوحة' : 'Inside GLOW PRETTY Qatar'}
-            </h2>
-          </div>
+      {/* Dynamic Gallery Section (Only shows when real salon photos are uploaded) */}
+      {gallery && gallery.length > 0 && (
+        <section id="gallery" className="py-20 bg-[#FFFDF5]">
+          <div className="max-w-7xl mx-auto px-6 md:px-16">
+            <div className="text-center mb-12">
+              <span className="text-[#121212] font-extrabold text-xs tracking-widest uppercase bg-[#FAF6ED] border border-[#D4AF37]/50 px-3.5 py-1 rounded-full shadow-2xs">
+                {isArabic ? 'معرض الصور الفاخر' : 'SALON ATMOSPHERE'}
+              </span>
+              <h2 className="font-display text-3xl md:text-4xl font-extrabold mt-3 text-[#121212]">
+                {isArabic ? 'أجواء صالون غلو بريتي بالدوحة' : 'Inside GLOW PRETTY Qatar'}
+              </h2>
+            </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {gallery.map((img) => (
-              <div
-                key={img.id}
-                className="rounded-2xl overflow-hidden relative group shadow-md hover:shadow-2xl transition-all duration-500 h-64 border border-[#D4AF37]/40"
-              >
-                <SmartImage
-                  src={img.url}
-                  alt={img.title}
-                  containerClassName="w-full h-full"
-                  className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
-                  <span className="text-white font-bold text-sm text-[#D4AF37]">
-                    {isArabic ? img.arabicTitle : img.title}
-                  </span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {gallery.map((img) => (
+                <div
+                  key={img.id}
+                  className="rounded-2xl overflow-hidden relative group shadow-md hover:shadow-2xl transition-all duration-500 h-64 border border-[#D4AF37]/40"
+                >
+                  <SmartImage
+                    src={img.url}
+                    alt={img.title}
+                    containerClassName="w-full h-full"
+                    className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
+                    <span className="text-white font-bold text-sm text-[#D4AF37]">
+                      {isArabic ? img.arabicTitle : img.title}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Final Call to Action */}
       <section className="py-16 bg-[#121212] text-white text-center relative overflow-hidden border-t-2 border-[#D4AF37]">
