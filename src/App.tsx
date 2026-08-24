@@ -95,13 +95,9 @@ export default function App() {
       const saved = sessionStorage.getItem('glow_services') || localStorage.getItem('glow_services');
       if (saved) {
         const parsed: Service[] = JSON.parse(saved);
-        return parsed.map((srv) => {
-          if (!srv.imageUrl || !srv.imageUrl.trim()) {
-            const fallback = INITIAL_SERVICES.find((s) => s.id === srv.id);
-            return fallback && fallback.imageUrl ? { ...srv, imageUrl: fallback.imageUrl } : srv;
-          }
-          return srv;
-        });
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
       }
       return INITIAL_SERVICES;
     } catch {
@@ -203,14 +199,7 @@ export default function App() {
         if (preloaded.siteSettings) setSiteSettings(preloaded.siteSettings);
         if (preloaded.categories && preloaded.categories.length > 0) setCategories(preloaded.categories);
         if (preloaded.services && preloaded.services.length > 0) {
-          const enriched = preloaded.services.map((srv) => {
-            if (!srv.imageUrl || !srv.imageUrl.trim()) {
-              const fallback = INITIAL_SERVICES.find((s) => s.id === srv.id);
-              return fallback && fallback.imageUrl ? { ...srv, imageUrl: fallback.imageUrl } : srv;
-            }
-            return srv;
-          });
-          setServices(enriched);
+          setServices(preloaded.services);
         }
         if (preloaded.appointments) {
           const validItems = preloaded.appointments
@@ -245,14 +234,9 @@ export default function App() {
     const unsubSite = subscribeToDoc<SiteSettings>('site_settings', (data) => setSiteSettings(data), INITIAL_SITE_SETTINGS);
     const unsubCat = subscribeToDocArray<CategoryItem>('categories', (items) => setCategories(items), INITIAL_CATEGORIES);
     const unsubSrv = subscribeToDocArray<Service>('services', (items) => {
-      const enriched = (items && items.length > 0 ? items : INITIAL_SERVICES).map((srv) => {
-        if (!srv.imageUrl || !srv.imageUrl.trim()) {
-          const fallback = INITIAL_SERVICES.find((s) => s.id === srv.id);
-          return fallback && fallback.imageUrl ? { ...srv, imageUrl: fallback.imageUrl } : srv;
-        }
-        return srv;
-      });
-      setServices(enriched);
+      if (items && items.length > 0) {
+        setServices(items);
+      }
     }, INITIAL_SERVICES);
     const unsubApt = subscribeToDocArray<Appointment>('appointments', (items) => {
       const validItems = (items || [])

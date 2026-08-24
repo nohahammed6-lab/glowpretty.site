@@ -31,6 +31,43 @@ if (typeof window !== 'undefined') {
     });
 }
 
+export const GLOW_CACHE_SCHEMA_VERSION = 'v2026.08.24_live_v5';
+
+// Purge any outdated or legacy client cache from prior builds
+export function purgeLegacyClientCache() {
+  if (typeof window === 'undefined') return;
+  try {
+    const currentVer = localStorage.getItem('glow_cache_version');
+    if (currentVer !== GLOW_CACHE_SCHEMA_VERSION) {
+      // Clear all legacy glow data from local and session storage
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('glow_') || key.startsWith('app_data_'))) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((k) => {
+        // Keep theme and pin preferences
+        if (k !== 'glow_theme' && k !== 'glow_owner_pin') {
+          localStorage.removeItem(k);
+        }
+      });
+      sessionStorage.clear();
+      memoryCache.clear();
+      localStorage.setItem('glow_cache_version', GLOW_CACHE_SCHEMA_VERSION);
+      console.log('✨ Glow Pretty cache refreshed to latest official version:', GLOW_CACHE_SCHEMA_VERSION);
+    }
+  } catch (err) {
+    console.warn('Cache purge check error:', err);
+  }
+}
+
+// Run purge check immediately on file load
+if (typeof window !== 'undefined') {
+  purgeLegacyClientCache();
+}
+
 // In-Memory Multi-Layer Cache for instantaneous cross-component and in-app browser state
 const memoryCache = new Map<string, string>();
 
@@ -83,9 +120,11 @@ export function persistJson(docId: string, json: string) {
  */
 export function hasLocalCache(): boolean {
   try {
+    const isLatestVersion = localStorage.getItem('glow_cache_version') === GLOW_CACHE_SCHEMA_VERSION;
+    if (!isLatestVersion) return false;
     const hasSrv = Boolean(localStorage.getItem('glow_services') || sessionStorage.getItem('glow_services'));
     const hasSettings = Boolean(localStorage.getItem('glow_site_settings') || sessionStorage.getItem('glow_site_settings'));
-    return hasSrv || hasSettings;
+    return hasSrv && hasSettings;
   } catch {
     return false;
   }
