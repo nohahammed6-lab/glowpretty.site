@@ -323,7 +323,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 >
                   <SmartImage
                     src={img.url}
-                    alt={img.title}
+                    alt={isArabic ? img.arabicTitle : img.title}
+                    priority={true}
+                    targetWidth={600}
                     containerClassName="w-full h-full"
                     className="w-full h-full object-cover group-hover:scale-110 transition-all duration-700"
                   />

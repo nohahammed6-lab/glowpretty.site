@@ -644,7 +644,36 @@ export const INITIAL_COUPONS: Coupon[] = [
   },
 ];
 
-export const INITIAL_GALLERY: GalleryItem[] = [];
+export const INITIAL_GALLERY: GalleryItem[] = [
+  {
+    id: 'gallery-hair-vip',
+    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDa1kmAYlPAESsmMTj8fLNVnuNpGhcEbhb_sA3eLnpMjMojqKWbzpWE7m5pe6vWWxJoDMl0RK4X9n8RqVn6gLqu2eLQjajQrq-PP8ilxlnTS7f4B3EbM5MCqmlijpgaCiCrXvqqWvx6qW0kSt2F_MwhawkhFDJOTuPKEsjdsgWvrHl9NyEj2Ul7NVGzl_Ljdejn3Gup7WkjCKLlrbeDw1JEQGITH36Ylrzw7fpRMl4t6jCX52Ffz_ON',
+    title: 'VIP Hair Styling & Treatments',
+    arabicTitle: 'أجنحة تصفيف وعلاج الشعر الملكية',
+    category: 'hair',
+  },
+  {
+    id: 'gallery-nail-spa',
+    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDZKN1OA81DtIv_Q_1QRunhFbiVg18ab-WjpiYVMdkTBykUv7gSVLwXHhYtCz7e9_LDwvOVjnZiP5rmx0e2sxAPou1XwwmSeEN2CZUZBzcXbqVjCW_2WuX1JHS7URaW2vbL3M1Y1a2uJfdpQHz1_PQRU_0J4TyAmBZ5JdNDfj3-U76brK8gbMyWz1bOUA8kgl5UZTKjKUwGevuKAPzIOfjg-VhvqPoht-BIoI7WS0MjigDRdXSF8dpP',
+    title: 'Luxury Nail Lounge & Spa',
+    arabicTitle: 'لاونج العناية بالأظافر والباديكير',
+    category: 'nails',
+  },
+  {
+    id: 'gallery-bridal-suite',
+    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBGFL5I3LixmgIm3Kjr7f56HShOkAMAwJ7Hu0PuVkvM5D0JQMCJDR3UcAfsZzcWlK1LuMXoKplyyJ95UDg13Hr-ZrTtFovF4tHdGY2zZmeWExCEet-wevcf4O6vJws5hE8n4SOgf70Zlq33YcbMJNP6UdHwiSG3zRDhqSB1bz6JKjXNFDPR_j5zCb0G0g3NCnq_dXnIjvvpkTWzhVvnurSA7vhkgNFJC5ROyYetHeUPcBv8kct7cJv_',
+    title: 'Royal Bridal & Glamour Suite',
+    arabicTitle: 'جناح العرائس والمكياج الملكي',
+    category: 'makeup',
+  },
+  {
+    id: 'gallery-moroccan-bath',
+    url: 'https://lh3.googleusercontent.com/aida-public/AB6AXuC0Cg3IHy8ilVhDQYQ-SQKAn7m6djDXhV6BZKktxR0GjeriqDCcT8hl_oZpNZNaGvtjfJBTA5WoPfgV7EzG3JIOIYphvC-JQjIGk3XSJzeuC6rL5ILgzIg-2hpwb_QFMd7RGrMOKKxxjYe-BciihNnbVaEm985_jR2SH3w1Cn9j08fMObWgYgYL3_loof_R4McbLvrvSF9Vkqx5WLXoQWh-EUK62EaNBt_PbQWGU5UKmin40MsHDHCm',
+    title: 'Royal Moroccan Bath & Spa',
+    arabicTitle: 'الحمام المغربي الملكي وجلسات الاسترخاء',
+    category: 'spa',
+  },
+];
 
 export const INITIAL_SITE_SETTINGS: SiteSettings = {
   phone: '+974 4411 2233',

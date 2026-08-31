@@ -90,6 +90,7 @@ export interface GalleryItem {
   title: string;
   arabicTitle: string;
   span?: string;
+  category?: string;
 }
 
 export interface SiteSettings {

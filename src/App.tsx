@@ -142,13 +142,14 @@ export default function App() {
       const saved = sessionStorage.getItem('glow_gallery') || localStorage.getItem('glow_gallery');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          return parsed.filter((g) => g && !['gal-1', 'gal-2', 'gal-3', 'gal-4'].includes(g.id));
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const valid = parsed.filter((g) => g && typeof g === 'object' && g.url);
+          if (valid.length > 0) return valid;
         }
       }
-      return [];
+      return INITIAL_GALLERY;
     } catch {
-      return [];
+      return INITIAL_GALLERY;
     }
   });
 
