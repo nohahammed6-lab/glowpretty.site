@@ -16,8 +16,9 @@ interface SmartImageProps {
 
 /**
  * SmartImage Component
- * Optimized for high-speed rendering with Cloudinary transformation,
- * native lazy-loading, layout shift prevention, and smooth fade-in.
+ * High-speed resilient rendering with Cloudinary optimization,
+ * native lazy-loading, automatic original URL fallback on error,
+ * no-referrer policy, and smooth layout stability.
  */
 export const SmartImage: React.FC<SmartImageProps> = ({
   src,
@@ -32,28 +33,53 @@ export const SmartImage: React.FC<SmartImageProps> = ({
   height,
 }) => {
   const optimizedSrc = getOptimizedImageUrl(src, { width: targetWidth });
-  const hasValidSrc = Boolean(optimizedSrc && optimizedSrc.trim().length > 0);
-
+  const [currentSrc, setCurrentSrc] = useState<string>(optimizedSrc || src || '');
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
-  const [hasError, setHasError] = useState<boolean>(!hasValidSrc);
+  const [hasError, setHasError] = useState<boolean>(false);
+  const imgRef = useRef<HTMLImageElement | null>(null);
 
+  // Sync currentSrc when src prop changes
   useEffect(() => {
-    if (!hasValidSrc) {
-      setIsLoaded(false);
-      setHasError(true);
+    const nextOptimized = getOptimizedImageUrl(src, { width: targetWidth });
+    const nextSrc = nextOptimized || src || '';
+    setCurrentSrc(nextSrc);
+    setIsLoaded(false);
+    setHasError(!nextSrc || nextSrc.trim().length === 0);
+
+    if (!nextSrc || !nextSrc.trim()) return;
+
+    // Check if image is already loaded in DOM or memory
+    if (imgRef.current && imgRef.current.complete && imgRef.current.naturalWidth > 0) {
+      setIsLoaded(true);
+      setHasError(false);
       return;
     }
 
-    setHasError(false);
-    setIsLoaded(false);
-
-    // Fast check: if the browser has already cached this exact URL, show it immediately
-    const img = new Image();
-    img.src = optimizedSrc;
-    if (img.complete && img.naturalWidth > 0) {
+    const probe = new Image();
+    probe.referrerPolicy = 'no-referrer';
+    probe.onload = () => {
       setIsLoaded(true);
+      setHasError(false);
+    };
+    probe.src = nextSrc;
+    if (probe.complete && probe.naturalWidth > 0) {
+      setIsLoaded(true);
+      setHasError(false);
     }
-  }, [optimizedSrc, hasValidSrc]);
+  }, [src, targetWidth]);
+
+  const hasValidSrc = Boolean(currentSrc && currentSrc.trim().length > 0);
+
+  const handleError = () => {
+    // If the optimized URL failed, fallback to the original raw src once before showing error
+    if (src && currentSrc !== src) {
+      setCurrentSrc(src);
+      setIsLoaded(false);
+    } else {
+      setIsLoaded(false);
+      setHasError(true);
+    }
+  };
 
   return (
     <div
@@ -62,9 +88,9 @@ export const SmartImage: React.FC<SmartImageProps> = ({
     >
       {/* Luxury Skeleton Loading Shimmer */}
       {hasValidSrc && !isLoaded && !hasError && (
-        <div className="absolute inset-0 bg-stone-200/60 dark:bg-stone-800/60 animate-pulse flex items-center justify-center z-10">
-          <span className="material-symbols-outlined text-amber-500/40 text-xl animate-spin">
-            sync
+        <div className="absolute inset-0 bg-[#f7f3eb] dark:bg-stone-800 animate-pulse flex items-center justify-center z-10">
+          <span className="material-symbols-outlined text-[#D4AF37]/50 text-xl animate-spin">
+            spa
           </span>
         </div>
       )}
@@ -76,27 +102,25 @@ export const SmartImage: React.FC<SmartImageProps> = ({
             {fallbackIcon}
           </span>
           <span className="text-[10px] font-bold text-stone-500 dark:text-stone-400 truncate max-w-full">
-            {alt || 'صورة غير متاحة'}
+            {alt || 'صورة صالون غلو بريتي'}
           </span>
         </div>
       ) : (
-        /* Rendered Image with key to force immediate unmount of stale image buffer and smooth transition */
         <img
-          key={optimizedSrc}
-          src={optimizedSrc}
+          ref={imgRef}
+          key={currentSrc}
+          src={currentSrc}
           alt={alt}
           width={width}
           height={height}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
+          referrerPolicy="no-referrer"
           onLoad={() => {
             setIsLoaded(true);
             setHasError(false);
           }}
-          onError={() => {
-            setIsLoaded(false);
-            setHasError(true);
-          }}
+          onError={handleError}
           className={`transition-opacity duration-300 ease-out ${
             isLoaded ? 'opacity-100' : 'opacity-0'
           } ${className}`}
@@ -105,4 +129,3 @@ export const SmartImage: React.FC<SmartImageProps> = ({
     </div>
   );
 };
-

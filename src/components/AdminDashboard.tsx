@@ -1980,6 +1980,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </div>
               </div>
 
+              {/* Hero Banner Background Image */}
+              <div className="bg-[#fcf9f8] p-5 rounded-2xl border border-[#D4AF37]/30 space-y-4">
+                <h4 className="font-bold text-sm text-[#9b0044] flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-base">image</span>
+                  <span>{isArabic ? 'صورة خلفية الواجهة الرئيسية (Hero Banner)' : 'Main Hero Banner Image'}</span>
+                </h4>
+                <CloudinaryImageUploader
+                  label={isArabic ? 'صورة الغلاف الرئيسية للموقع (رفع مباشر ☁️)' : 'Hero Banner Image (Cloudinary Upload)'}
+                  value={settingsForm.heroImageUrl || ''}
+                  onChange={(url) => setSettingsForm({ ...settingsForm, heroImageUrl: url })}
+                  isArabic={isArabic}
+                />
+              </div>
+
               <div className="pt-2">
                 <button type="submit" className="btn-burgundy px-8 py-3 rounded-xl text-sm font-bold cursor-pointer shadow-md">
                   {isArabic ? 'حفظ كافة البيانات والبيانات الإلكترونية' : 'Save Site Settings'}

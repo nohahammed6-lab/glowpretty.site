@@ -32,6 +32,14 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const isArabic = language === 'ar';
   const [writeReviewOpen, setWriteReviewOpen] = useState(false);
 
+  const defaultHeroImage =
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuAsMGMXYhPrbH1WJ_aj9vE92B6K-WMS0arHtFnIauna3ItgRupCK4TPg_9yAcnWrjlvHwryuTvw3SB3ZtnpoGjAcYeDccrPC5kqrd5yyEXOYmPaECy5zTC44GbsSDkGdcpl0R0REnYWCcUnw-s2CDEkfUPc2bQi7QIqZg-MOBOlIG9GmhZLiS_gZAPvdKP0DRv3Cxqr_9cc2TAYibe2ed3pToJxqhnp1zUR84yCHeIJGHC8NUP-v18I';
+  const heroImageSrc = siteSettings.heroImageUrl || defaultHeroImage;
+
+  const defaultAboutImage =
+    'https://lh3.googleusercontent.com/aida-public/AB6AXuDa1kmAYlPAESsmMTj8fLNVnuNpGhcEbhb_sA3eLnpMjMojqKWbzpWE7m5pe6vWWxJoDMl0RK4X9n8RqVn6gLqu2eLQjajQrq-PP8ilxlnTS7f4B3EbM5MCqmlijpgaCiCrXvqqWvx6qW0kSt2F_MwhawkhFDJOTuPKEsjdsgWvrHl9NyEj2Ul7NVGzl_Ljdejn3Gup7WkjCKLlrbeDw1JEQGITH36Ylrzw7fpRMl4t6jCX52Ffz_ON';
+  const aboutImageSrc = aboutContent.mainImageUrl || defaultAboutImage;
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -41,7 +49,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           <div
             className="w-full h-full bg-cover bg-center scale-105 transition-transform duration-[12s] ease-linear hover:scale-100"
             style={{
-              backgroundImage: `url('${getOptimizedImageUrl('https://lh3.googleusercontent.com/aida-public/AB6AXuAsMGMXYhPrbH1WJ_aj9vE92B6K-WMS0arHtFnIauna3ItgRupCK4TPg_9yAcnWrjlvHwryuTvw3SB3ZtnpoGjAcYeDccrPC5kqrd5yyEXOYmPaECy5zTC44GbsSDkGdcpl0R0REnYWCcUnw-s2CDEkfUPc2bQi7QIqZg-MOBOlIG9GmhZLiS_gZAPvdKP0DRv3Cxqr_9cc2TAYibe2ed3pToJxqhnp1zUR84yCHeIJGHC8NUP-v18I', { width: 1200 })}')`,
+              backgroundImage: `url('${getOptimizedImageUrl(heroImageSrc, { width: 1400 })}')`,
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-b sm:bg-gradient-to-r from-[#fcf9f8] via-[#fcf9f8]/95 sm:via-[#fcf9f8]/80 to-[#fcf9f8]/80 sm:to-transparent" />
@@ -139,17 +147,16 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             {/* Visual Feature Banner */}
             <div className="relative rounded-3xl overflow-hidden shadow-2xl border-2 border-[#D4AF37]/40 h-[400px]">
-              <img
-                src={getOptimizedImageUrl("https://lh3.googleusercontent.com/aida-public/AB6AXuDa1kmAYlPAESsmMTj8fLNVnuNpGhcEbhb_sA3eLnpMjMojqKWbzpWE7m5pe6vWWxJoDMl0RK4X9n8RqVn6gLqu2eLQjajQrq-PP8ilxlnTS7f4B3EbM5MCqmlijpgaCiCrXvqqWvx6qW0kSt2F_MwhawkhFDJOTuPKEsjdsgWvrHl9NyEj2Ul7NVGzl_Ljdejn3Gup7WkjCKLlrbeDw1JEQGITH36Ylrzw7fpRMl4t6jCX52Ffz_ON", { width: 800 })}
-                alt="Glow Pretty Salon"
-                loading="lazy"
-                decoding="async"
-                width={800}
-                height={400}
+              <SmartImage
+                src={aboutImageSrc}
+                alt={isArabic ? 'صالون غلو بريتي للتجميل' : 'Glow Pretty Salon'}
+                priority={true}
+                targetWidth={900}
+                containerClassName="w-full h-full"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute bottom-6 left-6 right-6 text-white p-4 glass-panel rounded-2xl border border-[#D4AF37]/40">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-6 left-6 right-6 text-white p-4 glass-panel rounded-2xl border border-[#D4AF37]/40 z-20">
                 <p className="font-bold text-sm text-[#D4AF37]">
                   {isArabic ? 'الدوحة - مدينة خليفة - قطر 🇶🇦' : 'Doha - Madinat Khalifa - Qatar 🇶🇦'}
                 </p>

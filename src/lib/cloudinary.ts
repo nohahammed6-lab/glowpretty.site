@@ -124,7 +124,7 @@ export function getOptimizedImageUrl(
   }
 
   // Googleusercontent Optimization
-  if (url.includes('lh3.googleusercontent.com')) {
+  if (url.includes('lh3.googleusercontent.com') && !url.includes('aida-public')) {
     if (options.width) {
       if (url.includes('=')) {
         return url.replace(/=s\d+/, `=s${options.width}`).replace(/=w\d+/, `=w${options.width}`);

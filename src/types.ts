@@ -104,6 +104,7 @@ export interface SiteSettings {
   tiktokUrl: string;
   snapchatUrl: string;
   facebookUrl: string;
+  heroImageUrl?: string;
 }
 
 export interface SupervisorPermission {
