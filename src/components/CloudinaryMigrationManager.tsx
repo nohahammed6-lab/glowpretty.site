@@ -8,6 +8,7 @@ import {
   persistMigratedUrl,
   isCloudinaryUrl,
 } from '../lib/migrationService';
+import { getOptimizedImageUrl } from '../lib/cloudinary';
 
 interface CloudinaryMigrationManagerProps {
   appData: AppDataForMigration;
@@ -456,7 +457,11 @@ export const CloudinaryMigrationManager: React.FC<CloudinaryMigrationManagerProp
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-10 h-10 rounded-lg overflow-hidden border bg-gray-100 shrink-0 flex items-center justify-center">
                     {failedItem.currentUrl && failedItem.currentUrl.trim() ? (
-                      <img src={failedItem.currentUrl} alt="" className="w-full h-full object-cover" />
+                      <img
+                        src={getOptimizedImageUrl(failedItem.currentUrl, { width: 80 })}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <span className="material-symbols-outlined text-gray-400 text-sm">broken_image</span>
                     )}
@@ -546,7 +551,11 @@ export const CloudinaryMigrationManager: React.FC<CloudinaryMigrationManagerProp
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-200 shrink-0 bg-gray-50 flex items-center justify-center">
                     {img.currentUrl && img.currentUrl.trim() ? (
-                      <img src={img.currentUrl} alt="" className="w-full h-full object-cover" />
+                      <img
+                        src={getOptimizedImageUrl(img.currentUrl, { width: 100 })}
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <span className="material-symbols-outlined text-gray-400 text-base">image</span>
                     )}

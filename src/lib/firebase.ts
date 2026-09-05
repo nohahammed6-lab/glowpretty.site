@@ -31,7 +31,7 @@ if (typeof window !== 'undefined') {
     });
 }
 
-export const GLOW_CACHE_SCHEMA_VERSION = 'v2026.08.31_live_v8_real_data';
+export const GLOW_CACHE_SCHEMA_VERSION = 'v2026.09.05_f_auto_q_auto';
 
 // Purge any outdated or legacy client cache from prior builds
 export function purgeLegacyClientCache() {

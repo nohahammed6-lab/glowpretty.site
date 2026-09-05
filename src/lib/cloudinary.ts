@@ -54,7 +54,8 @@ export async function uploadImageToCloudinary(
         try {
           const data: CloudinaryUploadResponse = JSON.parse(xhr.responseText);
           if (data && data.secure_url) {
-            resolve(data.secure_url);
+            const autoOptimizedUrl = addCloudinaryAutoOptimization(data.secure_url);
+            resolve(autoOptimizedUrl);
           } else {
             reject(new Error('استجابة Cloudinary لم تحتوي على رابط آمن (secure_url)'));
           }
@@ -81,6 +82,46 @@ export async function uploadImageToCloudinary(
 }
 
 /**
+ * Ensures any Cloudinary image URL contains the auto-format and auto-quality transformations (f_auto,q_auto)
+ * to minimize bandwidth / data traffic while preserving pristine visual fidelity.
+ */
+export function addCloudinaryAutoOptimization(url?: string | null): string {
+  if (!url || typeof url !== 'string' || !url.trim()) return '';
+  const trimmed = url.trim();
+
+  if (trimmed.includes('res.cloudinary.com') || trimmed.includes('cloudinary.com')) {
+    // If it already has both f_auto and q_auto, return as-is
+    if (trimmed.includes('f_auto') && trimmed.includes('q_auto')) {
+      return trimmed;
+    }
+
+    const uploadToken = trimmed.includes('/image/upload/') ? '/image/upload/' : '/upload/';
+    const uploadIndex = trimmed.indexOf(uploadToken);
+    if (uploadIndex === -1) return trimmed;
+
+    const base = trimmed.slice(0, uploadIndex + uploadToken.length);
+    const afterUpload = trimmed.slice(uploadIndex + uploadToken.length);
+
+    const segments = afterUpload.split('/');
+    const firstSegment = segments[0] || '';
+
+    const isVersion = /^v\d+$/.test(firstSegment);
+    const isFile = segments.length === 1 || (!isVersion && firstSegment.includes('.'));
+
+    if (isVersion || isFile) {
+      return base + 'f_auto,q_auto/' + afterUpload;
+    } else {
+      const existing = firstSegment.split(',').filter((p) => !p.startsWith('f_') && !p.startsWith('q_'));
+      existing.unshift('f_auto', 'q_auto');
+      segments[0] = existing.join(',');
+      return base + segments.join('/');
+    }
+  }
+
+  return trimmed;
+}
+
+/**
  * Optimizes Cloudinary and external image URLs by appending automatic formatting (f_auto, q_auto)
  * and target dimension constraints (e.g. w_500, c_limit) without breaking or corrupting existing URLs.
  */
@@ -89,14 +130,10 @@ export function getOptimizedImageUrl(
   options: { width?: number; height?: number; crop?: string; quality?: string } = {}
 ): string {
   if (!url || typeof url !== 'string' || !url.trim()) return '';
+  const trimmed = url.trim();
 
   // Cloudinary Optimization
-  if (url.includes('res.cloudinary.com') || url.includes('cloudinary.com')) {
-    // If it already has transformations, avoid duplicating or corrupting
-    if (url.includes('/upload/f_auto') || url.includes('/upload/q_auto')) {
-      return url;
-    }
-
+  if (trimmed.includes('res.cloudinary.com') || trimmed.includes('cloudinary.com')) {
     const { width, height, crop = 'limit', quality = 'auto' } = options;
     const transformParts: string[] = ['f_auto', `q_${quality}`];
 
@@ -106,8 +143,27 @@ export function getOptimizedImageUrl(
 
     const transformStr = transformParts.join(',');
 
-    // Safely insert right after /upload/
-    return url.replace('/upload/', `/upload/${transformStr}/`);
+    const uploadToken = trimmed.includes('/image/upload/') ? '/image/upload/' : '/upload/';
+    const uploadIndex = trimmed.indexOf(uploadToken);
+    if (uploadIndex === -1) return trimmed;
+
+    const base = trimmed.slice(0, uploadIndex + uploadToken.length);
+    const afterUpload = trimmed.slice(uploadIndex + uploadToken.length);
+
+    const segments = afterUpload.split('/');
+    const firstSegment = segments[0] || '';
+
+    const isVersion = /^v\d+$/.test(firstSegment);
+    const isFile = segments.length === 1 || (!isVersion && firstSegment.includes('.'));
+
+    if (isVersion || isFile) {
+      return base + transformStr + '/' + afterUpload;
+    } else {
+      // First segment contains transformations (e.g. f_auto,q_auto)
+      // Replace with full transformStr including width/crop if provided, or keep f_auto,q_auto
+      segments[0] = transformStr;
+      return base + segments.join('/');
+    }
   }
 
   // Unsplash Optimization

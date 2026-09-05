@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { uploadImageToCloudinary } from '../lib/cloudinary';
+import { uploadImageToCloudinary, addCloudinaryAutoOptimization, getOptimizedImageUrl } from '../lib/cloudinary';
 
 interface CloudinaryImageUploaderProps {
   value: string;
@@ -140,7 +140,7 @@ export const CloudinaryImageUploader: React.FC<CloudinaryImageUploaderProps> = (
             {value ? (
               <div className="relative group shrink-0 w-16 h-16 rounded-xl overflow-hidden border-2 border-[#D4AF37] shadow-xs bg-gray-50">
                 <img
-                  src={value}
+                  src={getOptimizedImageUrl(value, { width: 160 })}
                   alt="Uploaded Preview"
                   className="w-full h-full object-cover"
                   onError={(e) => {
@@ -188,7 +188,9 @@ export const CloudinaryImageUploader: React.FC<CloudinaryImageUploaderProps> = (
                 value={value}
                 required={required}
                 onChange={(e) => {
-                  onChange(e.target.value);
+                  const val = e.target.value;
+                  const optVal = addCloudinaryAutoOptimization(val);
+                  onChange(optVal);
                   if (statusMessage) setStatusMessage(null);
                 }}
                 placeholder={placeholder || (isArabic ? 'رابط الصورة (secure_url)...' : 'Image secure_url...')}

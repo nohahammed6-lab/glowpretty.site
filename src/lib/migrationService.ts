@@ -1,4 +1,4 @@
-import { uploadImageToCloudinary } from './cloudinary';
+import { uploadImageToCloudinary, addCloudinaryAutoOptimization } from './cloudinary';
 import { saveDoc, saveDocArray } from './firebase';
 import {
   Service,
@@ -279,14 +279,14 @@ export async function migrateSingleImage(
 ): Promise<string> {
   // Check if already Cloudinary
   if (isCloudinaryUrl(item.currentUrl)) {
-    return item.currentUrl;
+    return addCloudinaryAutoOptimization(item.currentUrl);
   }
 
   // Attempt 1: Upload directly via URL string (Cloudinary fetches it server-side, bypassing CORS)
   try {
     const secureUrl = await uploadImageToCloudinary(item.currentUrl, onProgress);
     if (secureUrl && isCloudinaryUrl(secureUrl)) {
-      return secureUrl;
+      return addCloudinaryAutoOptimization(secureUrl);
     }
   } catch (err) {
     console.warn(`Direct URL upload failed for ${item.currentUrl}, trying blob download fallback...`, err);
@@ -296,7 +296,7 @@ export async function migrateSingleImage(
   const blob = await downloadImageAsBlob(item.currentUrl);
   const secureUrl = await uploadImageToCloudinary(blob, onProgress);
 
-  return secureUrl;
+  return addCloudinaryAutoOptimization(secureUrl);
 }
 
 /**
@@ -308,10 +308,11 @@ export async function persistMigratedUrl(
   data: AppDataForMigration,
   callbacks?: DatabaseUpdateCallbacks
 ): Promise<void> {
+  const finalSecureUrl = addCloudinaryAutoOptimization(newSecureUrl);
   if (imageItem.sourceType === 'service') {
     const updatedServices = (data.services || []).map((srv) => {
       if (srv.id === imageItem.targetId) {
-        const updated = { ...srv, imageUrl: newSecureUrl };
+        const updated = { ...srv, imageUrl: finalSecureUrl };
         if (callbacks?.onUpdateService) callbacks.onUpdateService(updated);
         return updated;
       }
@@ -321,7 +322,7 @@ export async function persistMigratedUrl(
   } else if (imageItem.sourceType === 'gallery') {
     const updatedGallery = (data.gallery || []).map((gal) => {
       if (gal.id === imageItem.targetId) {
-        const updated = { ...gal, url: newSecureUrl };
+        const updated = { ...gal, url: finalSecureUrl };
         if (callbacks?.onUpdateGalleryItem) callbacks.onUpdateGalleryItem(updated);
         return updated;
       }
@@ -331,21 +332,21 @@ export async function persistMigratedUrl(
   } else if (imageItem.sourceType === 'about') {
     const updatedAbout = {
       ...data.aboutContent,
-      [imageItem.fieldKey]: newSecureUrl,
+      [imageItem.fieldKey]: finalSecureUrl,
     };
     if (callbacks?.onUpdateAboutContent) callbacks.onUpdateAboutContent(updatedAbout);
     await saveDoc('about_content', updatedAbout);
   } else if (imageItem.sourceType === 'site_settings') {
     const updatedSite = {
       ...data.siteSettings,
-      [imageItem.fieldKey]: newSecureUrl,
+      [imageItem.fieldKey]: finalSecureUrl,
     };
     if (callbacks?.onUpdateSiteSettings) callbacks.onUpdateSiteSettings(updatedSite);
     await saveDoc('site_settings', updatedSite);
   } else if (imageItem.sourceType === 'category') {
     const updatedCategories = (data.categories || []).map((cat: any) => {
       if (cat.id === imageItem.targetId) {
-        const updated = { ...cat, imageUrl: newSecureUrl };
+        const updated = { ...cat, imageUrl: finalSecureUrl };
         if (callbacks?.onUpdateCategory) callbacks.onUpdateCategory(updated);
         return updated;
       }
@@ -355,7 +356,7 @@ export async function persistMigratedUrl(
   } else if (imageItem.sourceType === 'review') {
     const updatedReviews = (data.reviews || []).map((rev: any) => {
       if (rev.id === imageItem.targetId) {
-        const updated = { ...rev, avatarUrl: newSecureUrl };
+        const updated = { ...rev, avatarUrl: finalSecureUrl };
         if (callbacks?.onUpdateReview) callbacks.onUpdateReview(updated);
         return updated;
       }
